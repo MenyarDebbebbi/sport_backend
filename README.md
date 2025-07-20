@@ -1,26 +1,16 @@
-# Backend API Sport
+# 🏋️ Backend API Sport
 
-Backend Express.js pour l'application sport avec authentification JWT, gestion des utilisateurs, exercices et entraînements.
+Backend complet pour l'application sport avec MongoDB, Express.js et authentification JWT.
 
-## 🚀 Fonctionnalités
+## 🚀 Installation
 
-- **Authentification JWT** : Inscription, connexion, gestion des tokens
-- **Gestion des utilisateurs** : Profils, rôles (user, trainer, admin)
-- **Gestion des exercices** : CRUD complet avec catégorisation et recherche
-- **Gestion des entraînements** : Création d'entraînements personnalisés
-- **Système de favoris** : Pour les exercices et entraînements
-- **Recherche avancée** : Filtres, tri, pagination
-- **Validation des données** : Express-validator avec messages personnalisés
-- **Sécurité** : Helmet, CORS, validation des entrées
-- **Base de données** : MongoDB avec Mongoose
-
-## 📋 Prérequis
+### Prérequis
 
 - Node.js (version 16 ou supérieure)
-- MongoDB (local ou Atlas)
+- MongoDB (local ou cloud)
 - npm ou yarn
 
-## 🛠️ Installation
+### Configuration
 
 1. **Cloner le projet**
 
@@ -34,245 +24,265 @@ cd back
 npm install
 ```
 
-3. **Configuration des variables d'environnement**
+3. **Configuration de l'environnement**
 
 ```bash
 cp env.example .env
 ```
 
-4. **Modifier le fichier `.env`**
+4. **Modifier le fichier .env**
 
 ```env
 # Configuration du serveur
 PORT=3000
 NODE_ENV=development
 
-# Configuration de la base de données
+# Base de données MongoDB
 MONGODB_URI=mongodb://localhost:27017/sport_app
 
-# Configuration JWT
-JWT_SECRET=votre_secret_jwt_tres_securise
-JWT_EXPIRES_IN=7d
+# JWT (JSON Web Token)
+JWT_SECRET=votre_secret_jwt_tres_securise_ici
+JWT_EXPIRE=7d
 
-# Configuration CORS
-FRONTEND_URL=http://localhost:5173
-
-# Configuration de sécurité
+# Bcrypt
 BCRYPT_ROUNDS=12
+
+# Frontend URL (pour CORS)
+FRONTEND_URL=http://localhost:5173
 ```
 
-5. **Démarrer le serveur**
+5. **Initialiser la base de données**
 
 ```bash
-# Mode développement (avec nodemon)
+npm run seed
+```
+
+6. **Démarrer le serveur**
+
+```bash
+# Mode développement
 npm run dev
 
 # Mode production
 npm start
 ```
 
-## 📚 Structure du projet
+## 📊 Structure de la base de données
 
-```
-back/
-├── src/
-│   ├── config/
-│   │   └── database.js          # Configuration MongoDB
-│   ├── controllers/
-│   │   └── authController.js    # Contrôleur d'authentification
-│   ├── middleware/
-│   │   ├── auth.js              # Middleware d'authentification JWT
-│   │   └── validation.js        # Middleware de validation
-│   ├── models/
-│   │   ├── User.js              # Modèle utilisateur
-│   │   ├── Exercise.js          # Modèle exercice
-│   │   └── Workout.js           # Modèle entraînement
-│   ├── routes/
-│   │   ├── auth.js              # Routes d'authentification
-│   │   ├── exercises.js         # Routes des exercices
-│   │   ├── users.js             # Routes des utilisateurs
-│   │   └── workouts.js          # Routes des entraînements
-│   └── server.js                # Point d'entrée de l'application
-├── public/                      # Fichiers statiques
-├── package.json
-├── env.example
-└── README.md
-```
+### Modèles MongoDB
 
-## 🔌 API Endpoints
+#### User (Utilisateur)
 
-### Authentification
+- Informations personnelles (nom, email, téléphone, ville)
+- Informations de santé (tension, diabète, cholestérol, allergies, etc.)
+- Statut (actif, en attente, inactif)
+- Rôle (utilisateur, coach, admin)
+- Coach assigné
 
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/login` - Connexion
-- `GET /api/auth/profile` - Profil utilisateur
-- `PUT /api/auth/profile` - Mise à jour du profil
-- `PUT /api/auth/change-password` - Changement de mot de passe
-- `POST /api/auth/logout` - Déconnexion
-- `POST /api/auth/refresh-token` - Rafraîchir le token
+#### Exercise (Exercice)
 
-### Utilisateurs
+- Nom, description, catégorie
+- Groupes musculaires ciblés
+- Niveau de difficulté
+- Équipement requis
+- Instructions et conseils
+- Durée et calories
 
-- `GET /api/users` - Liste des utilisateurs (admin)
-- `GET /api/users/:id` - Détails d'un utilisateur
-- `PUT /api/users/:id` - Mise à jour d'un utilisateur
-- `DELETE /api/users/:id` - Supprimer un utilisateur (admin)
-- `PATCH /api/users/:id/toggle-status` - Activer/désactiver (admin)
-- `GET /api/users/stats/overview` - Statistiques (admin)
-- `GET /api/users/search/users` - Recherche d'utilisateurs (admin)
+#### Workout (Entraînement)
 
-### Exercices
+- Nom, description, type
+- Liste d'exercices avec paramètres (séries, répétitions, poids, repos)
+- Niveau de difficulté
+- Public/privé
+- Utilisateurs assignés
 
-- `GET /api/exercises` - Liste des exercices
-- `GET /api/exercises/:id` - Détails d'un exercice
-- `POST /api/exercises` - Créer un exercice
-- `PUT /api/exercises/:id` - Mettre à jour un exercice
-- `DELETE /api/exercises/:id` - Supprimer un exercice
-- `POST /api/exercises/:id/favorite` - Ajouter/retirer des favoris
-- `GET /api/exercises/popular/list` - Exercices populaires
+#### Meal (Repas)
 
-### Entraînements
-
-- `GET /api/workouts` - Liste des entraînements
-- `GET /api/workouts/:id` - Détails d'un entraînement
-- `POST /api/workouts` - Créer un entraînement
-- `PUT /api/workouts/:id` - Mettre à jour un entraînement
-- `DELETE /api/workouts/:id` - Supprimer un entraînement
-- `POST /api/workouts/:id/favorite` - Ajouter/retirer des favoris
-- `POST /api/workouts/:id/complete` - Marquer comme terminé
-- `GET /api/workouts/popular/list` - Entraînements populaires
-- `GET /api/workouts/user/my-workouts` - Mes entraînements
+- Nom, description, type (petit-déjeuner, déjeuner, dîner, collation)
+- Liste d'aliments avec valeurs nutritionnelles
+- Statut (en attente, approuvé, rejeté)
+- Notes de révision
 
 ## 🔐 Authentification
 
-L'API utilise JWT (JSON Web Tokens) pour l'authentification.
+### JWT (JSON Web Token)
 
-### Headers requis
+- Tokens d'accès avec expiration
+- Refresh tokens
+- Middleware d'authentification
+- Autorisation par rôles
+
+### Rôles utilisateurs
+
+- **Admin** : Accès complet à toutes les fonctionnalités
+- **Coach** : Gestion des utilisateurs, exercices, entraînements et repas
+- **User** : Accès limité à ses propres données
+
+## 📡 API Endpoints
+
+### Authentification
 
 ```
-Authorization: Bearer <token>
-Content-Type: application/json
+POST /api/auth/register    - Inscription
+POST /api/auth/login       - Connexion
+GET  /api/auth/profile     - Profil utilisateur
+PUT  /api/auth/profile     - Mise à jour du profil
+POST /api/auth/logout      - Déconnexion
 ```
 
-### Exemple de requête authentifiée
+### Utilisateurs
 
-```javascript
-fetch("/api/exercises", {
-  headers: {
-    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "Content-Type": "application/json",
-  },
-});
+```
+GET    /api/users          - Liste des utilisateurs (admin/coach)
+GET    /api/users/:id      - Détails d'un utilisateur
+POST   /api/users          - Créer un utilisateur (admin/coach)
+PUT    /api/users/:id      - Mettre à jour un utilisateur
+DELETE /api/users/:id      - Supprimer un utilisateur (admin)
+GET    /api/users/stats    - Statistiques (admin)
+GET    /api/users/coaches  - Liste des coachs
 ```
 
-## 📊 Modèles de données
+### Exercices
 
-### User
-
-```javascript
-{
-  username: String,
-  email: String,
-  password: String (hashé),
-  firstName: String,
-  lastName: String,
-  dateOfBirth: Date,
-  gender: String,
-  height: Number,
-  weight: Number,
-  fitnessLevel: String,
-  goals: [String],
-  role: String,
-  isActive: Boolean,
-  // ... autres champs
-}
+```
+GET    /api/exercises                    - Liste des exercices
+GET    /api/exercises/:id                - Détails d'un exercice
+POST   /api/exercises                    - Créer un exercice (admin/coach)
+PUT    /api/exercises/:id                - Mettre à jour un exercice
+DELETE /api/exercises/:id                - Supprimer un exercice
+GET    /api/exercises/category/:category - Par catégorie
+GET    /api/exercises/muscle-group/:group - Par groupe musculaire
+GET    /api/exercises/stats              - Statistiques
 ```
 
-### Exercise
+### Entraînements
 
-```javascript
-{
-  name: String,
-  description: String,
-  category: String,
-  muscleGroups: [String],
-  difficulty: String,
-  equipment: [String],
-  instructions: [Object],
-  tips: [String],
-  videoUrl: String,
-  imageUrl: String,
-  duration: Number,
-  caloriesPerMinute: Number,
-  createdBy: ObjectId,
-  rating: Object,
-  favorites: [ObjectId]
-}
+```
+GET    /api/workouts                    - Liste des entraînements
+GET    /api/workouts/:id                - Détails d'un entraînement
+POST   /api/workouts                    - Créer un entraînement (admin/coach)
+PUT    /api/workouts/:id                - Mettre à jour un entraînement
+DELETE /api/workouts/:id                - Supprimer un entraînement
+GET    /api/workouts/user/:userId       - Entraînements d'un utilisateur
+GET    /api/workouts/type/:type         - Par type
+GET    /api/workouts/stats              - Statistiques
 ```
 
-### Workout
+### Repas
 
-```javascript
-{
-  name: String,
-  description: String,
-  type: String,
-  difficulty: String,
-  duration: Number,
-  exercises: [Object],
-  targetMuscleGroups: [String],
-  equipment: [String],
-  calories: Number,
-  isPublic: Boolean,
-  createdBy: ObjectId,
-  rating: Object,
-  favorites: [ObjectId],
-  completedCount: Number
-}
+```
+GET    /api/meals                       - Liste des repas
+GET    /api/meals/:id                   - Détails d'un repas
+POST   /api/meals                       - Créer un repas
+PUT    /api/meals/:id                   - Mettre à jour un repas
+DELETE /api/meals/:id                   - Supprimer un repas
+PATCH  /api/meals/:id/review            - Réviser un repas (admin/coach)
+GET    /api/meals/user/:userId          - Repas d'un utilisateur
+GET    /api/meals/type/:type            - Par type
+GET    /api/meals/stats                 - Statistiques
 ```
 
-## 🛡️ Sécurité
+## 🔧 Fonctionnalités
 
-- **Helmet** : Headers de sécurité
-- **CORS** : Configuration des origines autorisées
-- **Validation** : Validation des entrées avec express-validator
-- **Sanitisation** : Nettoyage des données d'entrée
-- **JWT** : Tokens sécurisés avec expiration
-- **Bcrypt** : Hachage des mots de passe
-- **Rate limiting** : Protection contre les attaques par déni de service
+### Gestion des utilisateurs
 
-## 🧪 Tests
+- CRUD complet des utilisateurs
+- Gestion des rôles et permissions
+- Informations de santé personnalisées
+- Assignation de coachs
+- Statistiques utilisateurs
 
-```bash
-# Lancer les tests
-npm test
+### Gestion des exercices
 
-# Tests en mode watch
-npm run test:watch
-```
+- Catalogue d'exercices complet
+- Filtrage par catégorie, difficulté, groupe musculaire
+- Instructions détaillées et conseils
+- Valeurs nutritionnelles
 
-## 📝 Scripts disponibles
+### Gestion des entraînements
+
+- Création d'entraînements personnalisés
+- Assignation d'exercices avec paramètres
+- Entraînements publics/privés
+- Suivi des entraînements utilisateur
+
+### Gestion des repas
+
+- Création de repas avec aliments détaillés
+- Calcul automatique des valeurs nutritionnelles
+- Système de révision par les coachs
+- Suivi nutritionnel
+
+### Sécurité
+
+- Validation des données avec express-validator
+- Hachage des mots de passe avec bcrypt
+- Authentification JWT
+- Autorisation par rôles
+- Protection CORS
+- Middleware de sécurité (helmet)
+
+## 🛠️ Scripts disponibles
 
 ```bash
 npm start          # Démarrer en mode production
 npm run dev        # Démarrer en mode développement
-npm test           # Lancer les tests
-npm run lint       # Vérifier le code
+npm run seed       # Initialiser la base de données
+npm test           # Exécuter les tests
 ```
 
-## 🔧 Configuration
+## 📝 Données d'exemple
 
-### Variables d'environnement
+Le script de seed crée automatiquement :
 
-| Variable         | Description              | Défaut                              |
-| ---------------- | ------------------------ | ----------------------------------- |
-| `PORT`           | Port du serveur          | 3000                                |
-| `NODE_ENV`       | Environnement            | development                         |
-| `MONGODB_URI`    | URI de connexion MongoDB | mongodb://localhost:27017/sport_app |
-| `JWT_SECRET`     | Secret pour JWT          | -                                   |
-| `JWT_EXPIRES_IN` | Expiration du token      | 7d                                  |
-| `FRONTEND_URL`   | URL du frontend          | http://localhost:5173               |
-| `BCRYPT_ROUNDS`  | Rounds pour bcrypt       | 12                                  |
+### Utilisateurs
+
+- **Admin** : admin@sport.com / admin123
+- **Coach** : coach@sport.com / coach123
+- **User** : user1@sport.com / user123
+
+### Exercices
+
+- Pompes (strength)
+- Squats (strength)
+- Course à pied (cardio)
+
+### Entraînements
+
+- Entraînement complet débutant
+- Cardio HIIT
+
+### Repas
+
+- Petit-déjeuner protéiné (approuvé)
+- Déjeuner équilibré (en attente)
+
+## 🔍 Tests
+
+```bash
+npm test
+```
+
+## 📦 Déploiement
+
+### Variables d'environnement de production
+
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/sport_app
+JWT_SECRET=secret_tres_securise_production
+FRONTEND_URL=https://votre-domaine.com
+```
+
+### Déploiement sur Heroku
+
+```bash
+heroku create votre-app-sport
+heroku config:set NODE_ENV=production
+heroku config:set MONGODB_URI=votre_uri_mongodb
+heroku config:set JWT_SECRET=votre_secret
+git push heroku main
+```
 
 ## 🤝 Contribution
 
@@ -288,4 +298,11 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 🆘 Support
 
-Pour toute question ou problème, veuillez ouvrir une issue sur GitHub.
+Pour toute question ou problème :
+
+- Ouvrir une issue sur GitHub
+- Contacter l'équipe de développement
+
+---
+
+**Développé avec ❤️ pour l'application Sport**

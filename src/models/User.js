@@ -58,6 +58,14 @@ const userSchema = new mongoose.Schema(
       enum: ["male", "female", "other"],
       required: [true, "Le genre est requis"],
     },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    city: {
+      type: String,
+      trim: true,
+    },
     height: {
       type: Number,
       min: [50, "La taille doit être d'au moins 50 cm"],
@@ -67,6 +75,35 @@ const userSchema = new mongoose.Schema(
       type: Number,
       min: [20, "Le poids doit être d'au moins 20 kg"],
       max: [500, "Le poids ne peut pas dépasser 500 kg"],
+    },
+    // Informations de santé
+    healthInfo: {
+      bloodPressure: {
+        type: String,
+        enum: ["normal", "high", "very_high"],
+        default: "normal",
+      },
+      diabetes: {
+        type: Boolean,
+        default: false,
+      },
+      cholesterol: {
+        type: String,
+        enum: ["normal", "high", "very_high"],
+        default: "normal",
+      },
+      allergies: {
+        type: String,
+        trim: true,
+      },
+      medications: {
+        type: String,
+        trim: true,
+      },
+      medicalHistory: {
+        type: String,
+        trim: true,
+      },
     },
     fitnessLevel: {
       type: String,
@@ -86,6 +123,11 @@ const userSchema = new mongoose.Schema(
         ],
       },
     ],
+    status: {
+      type: String,
+      enum: ["active", "pending", "inactive"],
+      default: "pending",
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -96,8 +138,12 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "trainer", "admin"],
+      enum: ["user", "coach", "admin"],
       default: "user",
+    },
+    assignedCoach: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     lastLogin: {
       type: Date,
@@ -115,6 +161,8 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ email: 1 });
 userSchema.index({ username: 1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ status: 1 });
+userSchema.index({ role: 1 });
 
 // Méthode pour hasher le mot de passe avant sauvegarde
 userSchema.pre("save", async function (next) {
