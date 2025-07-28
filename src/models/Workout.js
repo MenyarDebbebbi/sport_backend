@@ -1,10 +1,39 @@
 const mongoose = require("mongoose");
 
 const workoutExerciseSchema = new mongoose.Schema({
-  exercise: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Exercise",
-    required: true,
+  exerciseName: {
+    type: String,
+    required: [true, "Le nom de l'exercice est requis"],
+    trim: true,
+    maxlength: [100, "Le nom ne peut pas dépasser 100 caractères"],
+  },
+  exerciseDescription: {
+    type: String,
+    trim: true,
+    maxlength: [500, "La description ne peut pas dépasser 500 caractères"],
+  },
+  muscleGroup: {
+    type: String,
+    enum: [
+      "chest",
+      "back",
+      "shoulders",
+      "biceps",
+      "triceps",
+      "forearms",
+      "abs",
+      "obliques",
+      "quads",
+      "hamstrings",
+      "calves",
+      "glutes",
+      "full_body",
+    ],
+    required: [true, "Le groupe musculaire est requis"],
+  },
+  gifUrl: {
+    type: String,
+    trim: true,
   },
   sets: {
     type: Number,

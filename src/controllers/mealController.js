@@ -19,7 +19,7 @@ const getAllMeals = async (req, res) => {
     }
 
     // Si l'utilisateur n'est pas admin/coach, ne montrer que ses propres repas
-    if (req.user.role === "user") {
+    if (req.user && req.user.role === "user") {
       filters.createdBy = req.user._id;
     }
 
@@ -68,6 +68,7 @@ const getMealById = async (req, res) => {
 
     // Vérifier les permissions
     if (
+      req.user &&
       req.user.role === "user" &&
       meal.createdBy.toString() !== req.user._id.toString()
     ) {
@@ -283,7 +284,7 @@ const reviewMeal = async (req, res) => {
 // Obtenir les repas d'un utilisateur
 const getUserMeals = async (req, res) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const userId = req.params.userId || (req.user ? req.user._id : null);
 
     const meals = await Meal.find({
       $or: [{ createdBy: userId }, { assignedTo: userId }],
@@ -317,7 +318,7 @@ const getMealsByType = async (req, res) => {
     };
 
     // Si l'utilisateur n'est pas admin/coach, ne montrer que ses propres repas
-    if (req.user.role === "user") {
+    if (req.user && req.user.role === "user") {
       filters.createdBy = req.user._id;
     }
 

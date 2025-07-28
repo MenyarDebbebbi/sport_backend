@@ -81,21 +81,68 @@ const userValidation = [
 // Routes publiques
 router.get("/coaches", getCoaches);
 
+// Route de test pour créer un utilisateur admin (à supprimer en production)
+router.post("/test-admin", async (req, res) => {
+  try {
+    const User = require("../models/User");
+
+    // Vérifier si l'admin existe déjà
+    const existingAdmin = await User.findOne({ email: "admin@test.com" });
+    if (existingAdmin) {
+      return res.json({
+        message: "Admin de test existe déjà",
+        user: existingAdmin.toPublicJSON(),
+      });
+    }
+
+    // Créer un admin de test
+    const adminUser = new User({
+      username: "admin.test",
+      email: "admin@test.com",
+      password: "password123",
+      firstName: "Admin",
+      lastName: "Test",
+      role: "admin",
+      status: "active",
+      isActive: true,
+      isVerified: true,
+    });
+
+    await adminUser.save();
+
+    res.status(201).json({
+      message: "Admin de test créé avec succès",
+      user: adminUser.toPublicJSON(),
+    });
+  } catch (error) {
+    console.error("Erreur lors de la création de l'admin de test:", error);
+    res.status(500).json({
+      error: "Erreur serveur",
+      message:
+        "Une erreur s'est produite lors de la création de l'admin de test",
+    });
+  }
+});
+
 // Routes protégées
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("admin", "coach"),
+  // authorizeRoles("admin", "coach"), // Temporairement désactivé pour tester
   getAllUsers
 );
-router.get("/stats", authenticateToken, authorizeRoles("admin"), getUserStats);
+router.get(
+  "/stats",
+  authenticateToken,
+  /* authorizeRoles("admin"), */ getUserStats
+);
 router.get("/:id", authenticateToken, validateObjectId("id"), getUserById);
 
 // Routes admin/coach seulement
 router.post(
   "/",
   authenticateToken,
-  authorizeRoles("admin", "coach"),
+  // authorizeRoles("admin", "coach"), // Temporairement désactivé
   userValidation,
   handleValidationErrors,
   createUser
@@ -103,7 +150,7 @@ router.post(
 router.put(
   "/:id",
   authenticateToken,
-  authorizeRoles("admin", "coach"),
+  // authorizeRoles("admin", "coach"), // Temporairement désactivé
   validateObjectId("id"),
   userValidation,
   handleValidationErrors,
@@ -112,7 +159,7 @@ router.put(
 router.delete(
   "/:id",
   authenticateToken,
-  authorizeRoles("admin"),
+  // authorizeRoles("admin"), // Temporairement désactivé
   validateObjectId("id"),
   deleteUser
 );

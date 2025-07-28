@@ -67,6 +67,11 @@ const mealValidation = [
     .isFloat({ min: 0 })
     .withMessage("Les protéines ne peuvent pas être négatives"),
 
+  body("items.*.icon")
+    .optional()
+    .isString()
+    .withMessage("L'icône doit être une chaîne de caractères"),
+
   body("items.*.carbs")
     .optional()
     .isFloat({ min: 0 })
@@ -109,10 +114,12 @@ const reviewValidation = [
 ];
 
 // Routes publiques
-router.get("/", getAllMeals);
 router.get("/type/:type", getMealsByType);
 router.get("/stats", getMealStats);
 router.get("/:id", validateObjectId("id"), getMealById);
+
+// Routes protégées
+router.get("/", authenticateToken, getAllMeals);
 
 // Routes protégées
 router.get("/user/:userId?", authenticateToken, getUserMeals);

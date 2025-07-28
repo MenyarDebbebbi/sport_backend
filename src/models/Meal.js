@@ -6,6 +6,11 @@ const mealItemSchema = new mongoose.Schema({
     required: [true, "Le nom de l'aliment est requis"],
     trim: true,
   },
+  icon: {
+    type: String,
+    trim: true,
+    default: "",
+  },
   quantity: {
     type: Number,
     required: [true, "La quantité est requise"],
@@ -19,22 +24,27 @@ const mealItemSchema = new mongoose.Schema({
   calories: {
     type: Number,
     min: [0, "Les calories ne peuvent pas être négatives"],
+    default: 0,
   },
   protein: {
     type: Number,
     min: [0, "Les protéines ne peuvent pas être négatives"],
+    default: 0,
   },
   carbs: {
     type: Number,
     min: [0, "Les glucides ne peuvent pas être négatifs"],
+    default: 0,
   },
   fat: {
     type: Number,
     min: [0, "Les lipides ne peuvent pas être négatifs"],
+    default: 0,
   },
   fiber: {
     type: Number,
     min: [0, "Les fibres ne peuvent pas être négatives"],
+    default: 0,
   },
 });
 

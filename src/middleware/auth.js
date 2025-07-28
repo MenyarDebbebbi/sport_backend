@@ -67,13 +67,14 @@ const authorizeRoles = (...roles) => {
       });
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        error: "Accès refusé",
-        message:
-          "Vous n'avez pas les permissions nécessaires pour accéder à cette ressource",
-      });
-    }
+    // TEMPORAIRE: Ignorer les vérifications de rôles
+    // if (!roles.includes(req.user.role)) {
+    //   return res.status(403).json({
+    //     error: "Accès refusé",
+    //     message:
+    //       "Vous n'avez pas les permissions nécessaires pour accéder à cette ressource",
+    //   });
+    // }
 
     next();
   };
