@@ -51,10 +51,42 @@ const workoutValidation = [
     .isArray()
     .withMessage("Les exercices doivent être un tableau"),
 
-  body("exercises.*.exercise")
+  body("exercises.*.exerciseName")
     .optional()
-    .isMongoId()
-    .withMessage("ID d'exercice invalide"),
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "Le nom de l'exercice doit contenir entre 1 et 100 caractères"
+    ),
+
+  body("exercises.*.exerciseDescription")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage(
+      "La description de l'exercice ne peut pas dépasser 500 caractères"
+    ),
+
+  body("exercises.*.muscleGroup")
+    .optional()
+    .isIn([
+      "chest",
+      "back",
+      "shoulders",
+      "biceps",
+      "triceps",
+      "forearms",
+      "abs",
+      "obliques",
+      "quads",
+      "hamstrings",
+      "calves",
+      "glutes",
+      "full_body",
+    ])
+    .withMessage("Groupe musculaire invalide"),
+
+  body("exercises.*.gifUrl").optional().isURL().withMessage("URL GIF invalide"),
 
   body("exercises.*.sets")
     .optional()
@@ -108,10 +140,12 @@ const workoutValidation = [
 ];
 
 // Routes publiques
-router.get("/", getAllWorkouts);
 router.get("/type/:type", getWorkoutsByType);
 router.get("/stats", getWorkoutStats);
 router.get("/:id", validateObjectId("id"), getWorkoutById);
+
+// Routes protégées
+router.get("/", authenticateToken, getAllWorkouts);
 
 // Routes protégées
 router.get("/user/:userId?", authenticateToken, getUserWorkouts);

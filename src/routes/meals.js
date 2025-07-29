@@ -118,6 +118,40 @@ router.get("/type/:type", getMealsByType);
 router.get("/stats", getMealStats);
 router.get("/:id", validateObjectId("id"), getMealById);
 
+// Route temporaire pour créer un repas de test (à supprimer après test)
+router.post("/test", authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const testMeal = new Meal({
+      name: "Repas de test",
+      description: "Un repas de test pour vérifier la fonctionnalité",
+      type: "lunch",
+      items: [
+        {
+          name: "Poulet",
+          quantity: 100,
+          unit: "g",
+          calories: 165,
+          protein: 31,
+          carbs: 0,
+          fat: 3.6,
+          fiber: 0,
+        },
+      ],
+      createdBy: userId,
+      assignedTo: userId,
+    });
+
+    await testMeal.save();
+    await testMeal.populate("createdBy", "firstName lastName");
+
+    res.json({ message: "Repas de test créé", meal: testMeal });
+  } catch (error) {
+    console.error("Erreur création repas test:", error);
+    res.status(500).json({ error: "Erreur création repas test" });
+  }
+});
+
 // Routes protégées
 router.get("/", authenticateToken, getAllMeals);
 

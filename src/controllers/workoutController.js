@@ -1,5 +1,4 @@
 const Workout = require("../models/Workout");
-const Exercise = require("../models/Exercise");
 
 // Obtenir tous les entraînements (avec pagination et filtres)
 const getAllWorkouts = async (req, res) => {
@@ -20,14 +19,13 @@ const getAllWorkouts = async (req, res) => {
     }
 
     // Si l'utilisateur n'est pas admin/coach, ne montrer que les entraînements publics ou assignés
-    if (req.user.role === "user") {
+    if (req.user && req.user.role === "user") {
       filters.$or = [{ isPublic: true }, { assignedTo: req.user._id }];
     }
 
     const workouts = await Workout.find(filters)
       .populate("createdBy", "firstName lastName")
       .populate("assignedTo", "firstName lastName")
-      .populate("exercises.exercise", "name description category difficulty")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -58,11 +56,7 @@ const getWorkoutById = async (req, res) => {
   try {
     const workout = await Workout.findById(req.params.id)
       .populate("createdBy", "firstName lastName")
-      .populate("assignedTo", "firstName lastName")
-      .populate(
-        "exercises.exercise",
-        "name description category muscleGroups difficulty equipment instructions tips videoUrl imageUrl"
-      );
+      .populate("assignedTo", "firstName lastName");
 
     if (!workout) {
       return res.status(404).json({
@@ -73,6 +67,7 @@ const getWorkoutById = async (req, res) => {
 
     // Vérifier les permissions
     if (
+      req.user &&
       req.user.role === "user" &&
       !workout.isPublic &&
       !workout.assignedTo.includes(req.user._id)
@@ -109,20 +104,8 @@ const createWorkout = async (req, res) => {
       tags,
     } = req.body;
 
-    // Vérifier que tous les exercices existent
-    if (exercises && exercises.length > 0) {
-      const exerciseIds = exercises.map((ex) => ex.exercise);
-      const existingExercises = await Exercise.find({
-        _id: { $in: exerciseIds },
-      });
-
-      if (existingExercises.length !== exerciseIds.length) {
-        return res.status(400).json({
-          error: "Exercices invalides",
-          message: "Certains exercices n'existent pas",
-        });
-      }
-    }
+    // Les exercices sont maintenant intégrés directement dans le workout
+    // Pas besoin de vérifier l'existence des exercices externes
 
     const workout = new Workout({
       name,
@@ -229,9 +212,7 @@ const updateWorkout = async (req, res) => {
       runValidators: true,
     })
       .populate("createdBy", "firstName lastName")
-      .populate("assignedTo", "firstName lastName")
-      .populate("exercises.exercise", "name description category difficulty");
-
+      .populate("assignedTo", "firstName lastName");
     if (!workout) {
       return res.status(404).json({
         error: "Entraînement non trouvé",
@@ -295,7 +276,7 @@ const deleteWorkout = async (req, res) => {
 // Obtenir les entraînements d'un utilisateur
 const getUserWorkouts = async (req, res) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const userId = req.params.userId || (req.user ? req.user._id : null);
 
     const workouts = await Workout.find({
       $or: [{ createdBy: userId }, { assignedTo: userId }],
@@ -303,7 +284,7 @@ const getUserWorkouts = async (req, res) => {
     })
       .populate("createdBy", "firstName lastName")
       .populate("assignedTo", "firstName lastName")
-      .populate("exercises.exercise", "name description category difficulty")
+
       .sort({ createdAt: -1 });
 
     res.json({ workouts });
@@ -329,13 +310,13 @@ const getWorkoutsByType = async (req, res) => {
       isActive: true,
       $or: [
         { isPublic: true },
-        { createdBy: req.user._id },
-        { assignedTo: req.user._id },
+        ...(req.user
+          ? [{ createdBy: req.user._id }, { assignedTo: req.user._id }]
+          : []),
       ],
     })
       .populate("createdBy", "firstName lastName")
       .populate("assignedTo", "firstName lastName")
-      .populate("exercises.exercise", "name description category difficulty")
       .sort({ name: 1 });
 
     res.json({ workouts });

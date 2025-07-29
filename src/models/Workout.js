@@ -1,78 +1,10 @@
 const mongoose = require("mongoose");
 
-const workoutExerciseSchema = new mongoose.Schema({
-  exerciseName: {
-    type: String,
-    required: [true, "Le nom de l'exercice est requis"],
-    trim: true,
-    maxlength: [100, "Le nom ne peut pas dépasser 100 caractères"],
-  },
-  exerciseDescription: {
-    type: String,
-    trim: true,
-    maxlength: [500, "La description ne peut pas dépasser 500 caractères"],
-  },
-  muscleGroup: {
-    type: String,
-    enum: [
-      "chest",
-      "back",
-      "shoulders",
-      "biceps",
-      "triceps",
-      "forearms",
-      "abs",
-      "obliques",
-      "quads",
-      "hamstrings",
-      "calves",
-      "glutes",
-      "full_body",
-    ],
-    required: [true, "Le groupe musculaire est requis"],
-  },
-  gifUrl: {
-    type: String,
-    trim: true,
-  },
-  sets: {
-    type: Number,
-    required: true,
-    min: [1, "Le nombre de séries doit être d'au moins 1"],
-  },
-  repetitions: {
-    type: Number,
-    min: [1, "Le nombre de répétitions doit être d'au moins 1"],
-  },
-  weight: {
-    type: Number,
-    min: [0, "Le poids ne peut pas être négatif"],
-  },
-  duration: {
-    type: Number, // en secondes
-    min: [1, "La durée doit être d'au moins 1 seconde"],
-  },
-  rest: {
-    type: Number, // en secondes
-    min: [0, "Le temps de repos ne peut pas être négatif"],
-    default: 60,
-  },
-  notes: {
-    type: String,
-    trim: true,
-  },
-  order: {
-    type: Number,
-    required: true,
-    min: [1, "L'ordre doit être d'au moins 1"],
-  },
-});
-
 const workoutSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Le nom de l'entraînement est requis"],
+      required: [true, "Le nom de l'exercice est requis"],
       trim: true,
       maxlength: [100, "Le nom ne peut pas dépasser 100 caractères"],
     },
@@ -80,6 +12,25 @@ const workoutSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: [500, "La description ne peut pas dépasser 500 caractères"],
+    },
+    muscleGroup: {
+      type: String,
+      enum: [
+        "chest",
+        "back",
+        "shoulders",
+        "biceps",
+        "triceps",
+        "forearms",
+        "abs",
+        "obliques",
+        "quads",
+        "hamstrings",
+        "calves",
+        "glutes",
+        "full_body",
+      ],
+      required: [true, "Le groupe musculaire est requis"],
     },
     type: {
       type: String,
@@ -92,10 +43,44 @@ const workoutSchema = new mongoose.Schema(
       default: "beginner",
     },
     duration: {
-      type: Number, // en minutes
-      min: [1, "La durée doit être d'au moins 1 minute"],
+      type: Number, // en secondes
+      min: [1, "La durée doit être d'au moins 1 seconde"],
     },
-    exercises: [workoutExerciseSchema],
+    sets: {
+      type: Number,
+      required: true,
+      min: [1, "Le nombre de séries doit être d'au moins 1"],
+      default: 3,
+    },
+    repetitions: {
+      type: Number,
+      min: [1, "Le nombre de répétitions doit être d'au moins 1"],
+      default: 12,
+    },
+    weight: {
+      type: Number,
+      min: [0, "Le poids ne peut pas être négatif"],
+      default: 0,
+    },
+    rest: {
+      type: Number, // en secondes
+      min: [0, "Le temps de repos ne peut pas être négatif"],
+      default: 60,
+    },
+    gifUrl: {
+      type: String,
+      trim: true,
+    },
+    instructions: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    notes: {
+      type: String,
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

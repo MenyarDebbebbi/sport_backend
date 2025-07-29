@@ -285,15 +285,35 @@ const reviewMeal = async (req, res) => {
 const getUserMeals = async (req, res) => {
   try {
     const userId = req.params.userId || (req.user ? req.user._id : null);
+    console.log("getUserMeals - userId:", userId);
+    console.log("getUserMeals - req.params:", req.params);
+    console.log("getUserMeals - req.user:", req.user);
 
-    const meals = await Meal.find({
+    // Vérifier d'abord s'il y a des repas dans la base de données
+    const allMeals = await Meal.find({}).populate(
+      "createdBy",
+      "firstName lastName"
+    );
+    console.log("getUserMeals - all meals in DB:", allMeals.length);
+    console.log(
+      "getUserMeals - all meals:",
+      allMeals.map((m) => ({ id: m._id, name: m.name, createdBy: m.createdBy }))
+    );
+
+    const query = {
       $or: [{ createdBy: userId }, { assignedTo: userId }],
       isActive: true,
-    })
+    };
+    console.log("getUserMeals - query:", query);
+
+    const meals = await Meal.find(query)
       .populate("createdBy", "firstName lastName")
       .populate("assignedTo", "firstName lastName")
       .populate("reviewedBy", "firstName lastName")
       .sort({ createdAt: -1 });
+
+    console.log("getUserMeals - meals found:", meals.length);
+    console.log("getUserMeals - meals:", meals);
 
     res.json({ meals });
   } catch (error) {
