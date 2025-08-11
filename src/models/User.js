@@ -129,12 +129,20 @@ const userSchema = new mongoose.Schema(
 		},
 		role: {
 			type: String,
-			enum: ['user', 'coach', 'admin'],
+			enum: ['user', 'coach'],
 			default: 'user',
 		},
 		assignedCoach: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
+		},
+		pack: {
+			id: { type: Number, default: null },
+			title: { type: String, trim: true, default: null },
+			level: { type: String, trim: true, default: null },
+			price: { type: Number, default: null, min: 0 },
+			duration: { type: String, trim: true, default: null },
+			selectedAt: { type: Date, default: null },
 		},
 		lastLogin: {
 			type: Date,
