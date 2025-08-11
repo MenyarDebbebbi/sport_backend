@@ -15,7 +15,10 @@ app.use(helmet());
 app.use(compression());
 app.use(
 	cors({
-		origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+		origin:
+			process.env.NODE_ENV === 'production'
+				? process.env.FRONTEND_URL
+				: process.env.FRONTEND_URL_DEV,
 		credentials: true,
 	}),
 );
