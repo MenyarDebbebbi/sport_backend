@@ -170,6 +170,18 @@ const workoutSchema = new mongoose.Schema(
 				trim: true,
 			},
 		],
+		// Référence vers la séance (foreign key)
+		sessionId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Session',
+			default: null,
+		},
+		// Ordre dans la séance
+		order: {
+			type: Number,
+			min: [1, "L'ordre doit être d'au moins 1"],
+			default: 1,
+		},
 	},
 	{
 		timestamps: true,
@@ -187,6 +199,8 @@ workoutSchema.index({ isPublic: 1 });
 workoutSchema.index({ createdBy: 1 });
 workoutSchema.index({ assignedTo: 1 });
 workoutSchema.index({ createdAt: -1 });
+workoutSchema.index({ sessionId: 1 });
+workoutSchema.index({ sessionId: 1, order: 1 });
 
 // Méthode pour calculer la durée totale de l'entraînement
 workoutSchema.methods.calculateTotalDuration = function () {
