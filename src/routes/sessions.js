@@ -94,6 +94,41 @@ const sessionValidation = [
     .isInt({ min: 1 })
     .withMessage("L'ordre doit être d'au moins 1"),
 
+  // Validations pour les exercices combinés dans les sessions
+  body("exercises.*.exercise.isCombinedExercise")
+    .optional()
+    .isBoolean()
+    .withMessage("isCombinedExercise doit être un booléen"),
+
+  body("exercises.*.exercise.secondaryGifUrl")
+    .optional()
+    .isURL()
+    .withMessage("URL du deuxième GIF invalide"),
+
+  body("exercises.*.exercise.secondaryExercise.name")
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "Le nom du deuxième exercice doit contenir entre 1 et 100 caractères"
+    ),
+
+  body("exercises.*.exercise.secondaryExercise.description")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage(
+      "La description du deuxième exercice ne peut pas dépasser 500 caractères"
+    ),
+
+  body("exercises.*.exercise.secondaryExercise.category")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage(
+      "La catégorie du deuxième exercice ne peut pas dépasser 100 caractères"
+    ),
+
   body("isPublic")
     .optional()
     .isBoolean()

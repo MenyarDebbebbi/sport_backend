@@ -216,6 +216,41 @@ const sessionExerciseValidation = [
     .withMessage("Les notes ne peuvent pas dépasser 500 caractères"),
 
   body("gifUrl").optional().isURL().withMessage("URL GIF invalide"),
+
+  // Validations pour les exercices combinés
+  body("isCombinedExercise")
+    .optional()
+    .isBoolean()
+    .withMessage("isCombinedExercise doit être un booléen"),
+
+  body("secondaryGifUrl")
+    .optional()
+    .isURL()
+    .withMessage("URL du deuxième GIF invalide"),
+
+  body("secondaryExercise.name")
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "Le nom du deuxième exercice doit contenir entre 1 et 100 caractères"
+    ),
+
+  body("secondaryExercise.description")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage(
+      "La description du deuxième exercice ne peut pas dépasser 500 caractères"
+    ),
+
+  body("secondaryExercise.category")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage(
+      "La catégorie du deuxième exercice ne peut pas dépasser 100 caractères"
+    ),
 ];
 
 // Routes publiques
