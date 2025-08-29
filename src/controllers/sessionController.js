@@ -35,6 +35,13 @@ const getAllSessions = async (req, res) => {
 			.skip(skip)
 			.limit(parseInt(limit));
 
+		sessions.forEach((session) => async () => {
+			for (const combinedWorkout of session.combinedWorkouts) {
+				const workouts = await Workout.find({ _id: { $in: combinedWorkout.workouts } });
+				combinedWorkout.workouts = workouts;
+			}
+		});
+
 		const total = await Session.countDocuments(filter);
 
 		res.json({
@@ -224,6 +231,13 @@ const getUserSessions = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.skip(skip)
 			.limit(parseInt(limit));
+
+		for (const session of sessions) {
+			for (const combinedWorkout of session.combinedWorkouts) {
+				const workouts = await Workout.find({ _id: { $in: combinedWorkout.workouts } });
+				combinedWorkout.workouts = workouts;
+			}
+		}
 
 		const total = await Session.countDocuments(filter);
 
