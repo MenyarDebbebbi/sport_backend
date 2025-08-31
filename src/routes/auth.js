@@ -110,6 +110,27 @@ const loginValidation = [
   body("password").notEmpty().withMessage("Le mot de passe est requis"),
 ];
 
+// Validation pour la récupération de mot de passe
+const forgotPasswordValidation = [
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Veuillez fournir un email valide"),
+];
+
+// Validation pour la réinitialisation de mot de passe
+const resetPasswordValidation = [
+  body("token").notEmpty().withMessage("Le token de récupération est requis"),
+
+  body("newPassword")
+    .isLength({ min: 6 })
+    .withMessage("Le nouveau mot de passe doit contenir au moins 6 caractères")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage(
+      "Le nouveau mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre"
+    ),
+];
+
 // Validation pour le changement de mot de passe
 const changePasswordValidation = [
   body("currentPassword")
@@ -139,6 +160,20 @@ router.post(
   loginValidation,
   handleValidationErrors,
   authController.login
+);
+router.post(
+  "/forgot-password",
+  sanitizeInput,
+  forgotPasswordValidation,
+  handleValidationErrors,
+  authController.forgotPassword
+);
+router.post(
+  "/reset-password",
+  sanitizeInput,
+  resetPasswordValidation,
+  handleValidationErrors,
+  authController.resetPassword
 );
 router.get("/me", authenticateToken, authController.getMe);
 router.put(
