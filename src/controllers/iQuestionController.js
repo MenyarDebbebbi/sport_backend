@@ -27,31 +27,8 @@ const getUserQuestions = async (req, res) => {
       });
     }
 
-    // Si c'est un coach qui accède à ses propres questions, permettre l'accès
-    if (
-      req.user.role === "coach" &&
-      req.user._id.toString() === userId.toString()
-    ) {
-      // Permettre l'accès
-    } else if (
-      req.user._id.toString() !== userId.toString() &&
-      !["admin"].includes(req.user.role)
-    ) {
-      // Pour les coachs qui accèdent aux questions d'autres utilisateurs, vérifier qu'ils sont assignés
-      if (req.user.role === "coach") {
-        // Vérifier si le coach est assigné à cet utilisateur
-        if (
-          !user.assignedCoach ||
-          user.assignedCoach.toString() !== req.user._id.toString()
-        ) {
-          return res.status(403).json({
-            error: "Permission refusée",
-            message:
-              "Vous ne pouvez accéder qu'aux questions des utilisateurs qui vous sont assignés",
-          });
-        }
-      }
-    }
+    // Les coaches et admins peuvent accéder aux questions de tous les utilisateurs
+    // Pas besoin de vérification supplémentaire pour les coaches
 
     let questions = await IQuestion.findOne({ userId }).populate(
       "userId",
@@ -116,31 +93,8 @@ const createOrUpdateQuestions = async (req, res) => {
       });
     }
 
-    // Si c'est un coach qui modifie ses propres questions, permettre l'accès
-    if (
-      req.user.role === "coach" &&
-      req.user._id.toString() === userId.toString()
-    ) {
-      // Permettre l'accès
-    } else if (
-      req.user._id.toString() !== userId.toString() &&
-      !["admin"].includes(req.user.role)
-    ) {
-      // Pour les coachs qui modifient les questions d'autres utilisateurs, vérifier qu'ils sont assignés
-      if (req.user.role === "coach") {
-        // Vérifier si le coach est assigné à cet utilisateur
-        if (
-          !user.assignedCoach ||
-          user.assignedCoach.toString() !== req.user._id.toString()
-        ) {
-          return res.status(403).json({
-            error: "Permission refusée",
-            message:
-              "Vous ne pouvez modifier que les questions des utilisateurs qui vous sont assignés",
-          });
-        }
-      }
-    }
+    // Les coaches et admins peuvent modifier les questions de tous les utilisateurs
+    // Pas besoin de vérification supplémentaire pour les coaches
 
     const {
       bloodPressure,
@@ -482,38 +436,8 @@ const getUserRecommendations = async (req, res) => {
       });
     }
 
-    // Si c'est un coach qui accède à ses propres recommandations, permettre l'accès
-    if (
-      req.user.role === "coach" &&
-      req.user._id.toString() === userId.toString()
-    ) {
-      // Permettre l'accès
-    } else if (
-      req.user._id.toString() !== userId.toString() &&
-      !["admin"].includes(req.user.role)
-    ) {
-      // Pour les coachs qui accèdent aux recommandations d'autres utilisateurs, vérifier qu'ils sont assignés
-      if (req.user.role === "coach") {
-        // Vérifier si le coach est assigné à cet utilisateur
-        const user = await User.findById(userId);
-        if (!user) {
-          return res.status(404).json({
-            error: "Utilisateur non trouvé",
-            message: "L'utilisateur demandé n'existe pas",
-          });
-        }
-        if (
-          !user.assignedCoach ||
-          user.assignedCoach.toString() !== req.user._id.toString()
-        ) {
-          return res.status(403).json({
-            error: "Permission refusée",
-            message:
-              "Vous ne pouvez accéder qu'aux recommandations des utilisateurs qui vous sont assignés",
-          });
-        }
-      }
-    }
+    // Les coaches et admins peuvent accéder aux recommandations de tous les utilisateurs
+    // Pas besoin de vérification supplémentaire pour les coaches
 
     const questions = await IQuestion.findOne({ userId });
 
