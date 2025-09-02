@@ -49,6 +49,7 @@ app.use("/api/workouts", require("./routes/workouts"));
 app.use("/api/meals", require("./routes/meals"));
 app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/sessions", require("./routes/sessions"));
+app.use("/api/i-questions", require("./routes/iQuestions"));
 
 // Middleware de gestion d'erreurs
 app.use((err, req, res, next) => {
