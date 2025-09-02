@@ -16,6 +16,74 @@ const {
   getUserRecommendations,
 } = require("../controllers/iQuestionController");
 
+// Middleware pour nettoyer les données avant validation
+const sanitizeHealthData = (req, res, next) => {
+  // Convertir les valeurs null, undefined, et chaînes vides en undefined pour les champs numériques
+  const numericFields = [
+    "restingHeartRate",
+    "cardioTest",
+    "pushupsPerMinute",
+    "situpsPerMinute",
+    "stretching",
+    "bodyFatPercentage",
+    "bodyWeight",
+  ];
+
+  numericFields.forEach((field) => {
+    if (
+      req.body[field] === null ||
+      req.body[field] === "" ||
+      req.body[field] === 0
+    ) {
+      delete req.body[field];
+    }
+  });
+
+  // Gérer la pression artérielle
+  if (req.body.bloodPressure) {
+    if (
+      req.body.bloodPressure.systolic === null ||
+      req.body.bloodPressure.systolic === "" ||
+      req.body.bloodPressure.systolic === 0
+    ) {
+      delete req.body.bloodPressure.systolic;
+    }
+    if (
+      req.body.bloodPressure.diastolic === null ||
+      req.body.bloodPressure.diastolic === "" ||
+      req.body.bloodPressure.diastolic === 0
+    ) {
+      delete req.body.bloodPressure.diastolic;
+    }
+    // Si les deux champs sont supprimés, supprimer l'objet entier
+    if (!req.body.bloodPressure.systolic && !req.body.bloodPressure.diastolic) {
+      delete req.body.bloodPressure;
+    }
+  }
+
+  // Convertir les chaînes vides en undefined pour les champs de chaîne
+  const stringFields = [
+    "heartProblems",
+    "chestPainDuringExercise",
+    "chestPainLastMonth",
+    "dizzinessOrFainting",
+    "jointProblems",
+    "bloodPressureOrHeartMedication",
+    "type1Diabetes",
+    "otherExerciseRestrictions",
+    "hasAllergies",
+    "allergiesDetails",
+  ];
+
+  stringFields.forEach((field) => {
+    if (req.body[field] === null || req.body[field] === "") {
+      delete req.body[field];
+    }
+  });
+
+  next();
+};
+
 // Validation pour les questions de santé
 const questionValidation = [
   // Pression artérielle
@@ -140,6 +208,7 @@ router.get("/my-questions", authenticateToken, getUserQuestions);
 router.post(
   "/my-questions",
   authenticateToken,
+  sanitizeHealthData,
   questionValidation,
   handleValidationErrors,
   createOrUpdateQuestions
@@ -147,6 +216,7 @@ router.post(
 router.put(
   "/my-questions",
   authenticateToken,
+  sanitizeHealthData,
   questionValidation,
   handleValidationErrors,
   createOrUpdateQuestions
