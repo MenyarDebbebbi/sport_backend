@@ -66,8 +66,16 @@ const sessionValidation = [
     ),
 
   body("exercises.*.sets")
-    .isInt({ min: 1 })
-    .withMessage("Le nombre de séries doit être d'au moins 1"),
+    .optional()
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("Le nombre de séries doit être d'au moins 1");
+    }),
 
   body("exercises.*.repetitions")
     .optional()

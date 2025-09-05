@@ -64,7 +64,6 @@ const workoutExerciseSchema = new mongoose.Schema(
     sets: {
       type: Number,
       min: [1, "Le nombre de séries doit être d'au moins 1"],
-      default: 3,
     },
     repetitions: {
       type: Number,
@@ -143,7 +142,6 @@ const workoutSchema = new mongoose.Schema(
     },
     sets: {
       type: Number,
-      required: true,
       min: [1, "Le nombre de séries doit être d'au moins 1"],
       default: 3,
     },
