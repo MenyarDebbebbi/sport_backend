@@ -76,7 +76,6 @@ const workoutExerciseSchema = new mongoose.Schema(
     },
     duration: {
       type: Number, // en secondes
-      min: [1, "La durée doit être d'au moins 1 seconde"],
     },
     rest: {
       type: Number, // en secondes
@@ -138,7 +137,6 @@ const workoutSchema = new mongoose.Schema(
     },
     duration: {
       type: Number, // en secondes
-      min: [1, "La durée doit être d'au moins 1 seconde"],
     },
     sets: {
       type: Number,

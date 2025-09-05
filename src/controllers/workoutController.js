@@ -335,6 +335,7 @@ const createCombinedWorkout = async (req, res) => {
 // Mettre à jour un entraînement
 const updateWorkout = async (req, res) => {
   try {
+    console.log("updateWorkout called with body:", req.body);
     const {
       name,
       description,
@@ -349,12 +350,15 @@ const updateWorkout = async (req, res) => {
       // Champs spécifiques aux exercices combinés
       sets,
       repetitions,
+      weight,
       rest,
       gifUrl,
       secondaryGifUrl,
       secondaryExercise,
       isCombinedExercise,
     } = req.body;
+
+    console.log("Extracted weight from body:", weight);
 
     const updateData = {
       name,
@@ -370,6 +374,7 @@ const updateWorkout = async (req, res) => {
       // Champs spécifiques aux exercices combinés
       sets,
       repetitions,
+      weight,
       rest,
       gifUrl,
       secondaryGifUrl,
@@ -377,10 +382,14 @@ const updateWorkout = async (req, res) => {
       isCombinedExercise,
     };
 
+    console.log("updateData before cleaning:", updateData);
+
     // Supprimer les champs undefined
     Object.keys(updateData).forEach(
       (key) => updateData[key] === undefined && delete updateData[key]
     );
+
+    console.log("updateData after cleaning:", updateData);
 
     // Pas de validation de modèles externes nécessaire pour les exercices intégrés
 

@@ -51,8 +51,15 @@ const workoutValidation = [
 
   body("duration")
     .optional()
-    .isFloat({ min: 1 })
-    .withMessage("La durée doit être d'au moins 1 minute"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("La durée doit être d'au moins 1 minute");
+    }),
 
   body("exercises")
     .optional()
@@ -115,13 +122,27 @@ const workoutValidation = [
 
   body("exercises.*.weight")
     .optional()
-    .isFloat({ min: 0 })
-    .withMessage("Le poids ne peut pas être négatif"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 0) {
+        return true; // Allow valid numbers including 0
+      }
+      throw new Error("Le poids ne peut pas être négatif");
+    }),
 
   body("exercises.*.duration")
     .optional()
-    .isFloat({ min: 1 })
-    .withMessage("La durée doit être d'au moins 1 seconde"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("La durée doit être d'au moins 1 seconde");
+    }),
 
   body("exercises.*.rest")
     .optional()
@@ -215,13 +236,27 @@ const sessionExerciseValidation = [
 
   body("weight")
     .optional({ nullable: true })
-    .isFloat({ min: 0 })
-    .withMessage("Le poids ne peut pas être négatif"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 0) {
+        return true; // Allow valid numbers including 0
+      }
+      throw new Error("Le poids ne peut pas être négatif");
+    }),
 
   body("duration")
     .optional({ nullable: true })
-    .isInt({ min: 1 })
-    .withMessage("La durée doit être d'au moins 1 seconde"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("La durée doit être d'au moins 1 seconde");
+    }),
 
   body("rest")
     .optional({ nullable: true })

@@ -32,8 +32,16 @@ const sessionValidation = [
     .withMessage("La description ne peut pas dépasser 500 caractères"),
 
   body("duration")
-    .isInt({ min: 1 })
-    .withMessage("La durée doit être d'au moins 1 minute"),
+    .optional()
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("La durée doit être d'au moins 1 minute");
+    }),
 
   body("type")
     .optional()
@@ -89,8 +97,15 @@ const sessionValidation = [
 
   body("exercises.*.duration")
     .optional()
-    .isInt({ min: 1 })
-    .withMessage("La durée doit être d'au moins 1 seconde"),
+    .custom((value) => {
+      if (value === undefined || value === null || value === "") {
+        return true; // Allow empty values
+      }
+      if (typeof value === "number" && value >= 1) {
+        return true; // Allow valid numbers
+      }
+      throw new Error("La durée doit être d'au moins 1 seconde");
+    }),
 
   body("exercises.*.rest")
     .optional()
