@@ -439,8 +439,17 @@ const getStats = async (req, res) => {
     });
     const totalWorkouts = await Workout.countDocuments();
     const totalMeals = await Meal.countDocuments();
+    const totalSessions = await Session.countDocuments();
 
-    res.json({ totalUsers, totalPendingUsers, totalWorkouts, totalMeals });
+    res.json({
+      stats: {
+        totalUsers,
+        totalPendingUsers,
+        totalWorkouts,
+        totalMeals,
+        totalSessions,
+      },
+    });
   } catch (error) {
     console.error("Erreur lors de la récupération des statistiques:", error);
     res.status(500).json({
@@ -453,26 +462,29 @@ const getStats = async (req, res) => {
 
 const getUserStats = async (req, res) => {
   try {
-    let workouts = [];
-    let combinedWorkouts = [];
-    let meals = [];
+    const userId = req.query.userId;
 
-    const sessions = await Session.find({
-      where: { assignedTo: { $in: [req.query.userId] } },
-    });
-
-    for (const session of sessions) {
-      workouts = [
-        ...workouts,
-        ...(await Workout.find({ sessionId: session._id })),
-      ];
-      combinedWorkouts = [
-        ...combinedWorkouts,
-        ...(await CombinedWorkout.find({ sessionId: session._id })),
-      ];
+    if (!userId) {
+      return res.status(400).json({
+        error: "Paramètre manquant",
+        message: "L'ID utilisateur est requis",
+      });
     }
 
-    meals = await Meal.find({ assignedTo: req.query.userId });
+    // Find sessions for the user
+    const sessions = await Session.find({
+      assignedTo: { $in: [userId] },
+    });
+
+    // Get session IDs for efficient querying
+    const sessionIds = sessions.map((session) => session._id);
+
+    // Execute all queries in parallel for better performance
+    const [workouts, combinedWorkouts, meals] = await Promise.all([
+      Workout.find({ sessionId: { $in: sessionIds } }),
+      CombinedWorkout.find({ sessionId: { $in: sessionIds } }),
+      Meal.find({ assignedTo: userId }),
+    ]);
 
     const totalWorkouts = workouts.length;
     const totalCombinedWorkouts = combinedWorkouts.length;
@@ -480,10 +492,12 @@ const getUserStats = async (req, res) => {
     const totalSessions = sessions.length;
 
     res.json({
-      totalWorkouts,
-      totalCombinedWorkouts,
-      totalMeals,
-      totalSessions,
+      stats: {
+        totalWorkouts,
+        totalCombinedWorkouts,
+        totalMeals,
+        totalSessions,
+      },
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des statistiques:", error);
